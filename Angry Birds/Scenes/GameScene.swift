@@ -13,17 +13,28 @@ class GameScene: SKScene {
 	
 	let gameCamera = GameCamera()
 	var panner = UIPanGestureRecognizer() // for panning on screen
+	var tileMapNode = SKTileMapNode() // to set the constraint on the camera
 	
 	//MARK: - When game scene gets loaded
     override func didMove(to view: SKView) {
-		addCameraNode()
+		getTileMapNodeReference()
 		setUpPanningGestureRecognizer()
     }
+	
+	//MARK: - Before setting the constraints to the cameraNode and adding it to scene, get the TileMapNode reference
+	func getTileMapNodeReference() {
+		if let tileMapNode = self.childNode(withName: "Tile Map Node") as? SKTileMapNode {
+			self.tileMapNode = tileMapNode
+		}
+		addCameraNode()
+	}
 	
 	//MARK: - Add camera node to "center" which is the bottom-left of view
 	func addCameraNode() {
 		guard let view = view else {return}
 		gameCamera.position = CGPoint(x: view.bounds.size.width/2, y: view.bounds.size.height/2)
+		
+		gameCamera.addConstraints(with: self, and: tileMapNode.frame, to: nil)
 		
 		self.addChild(gameCamera)
 		self.camera = gameCamera
